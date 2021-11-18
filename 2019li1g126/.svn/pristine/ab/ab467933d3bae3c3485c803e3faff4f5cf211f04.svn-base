@@ -1,0 +1,100 @@
+-- | Este módulo define funções comuns da Tarefa 5 do trabalho prático.
+module Main where
+
+import LI11920
+import Graphics.Gloss
+import Graphics.Gloss.Data.Color
+--import Graphics.Gloss.Juicy 
+import Graphics.Gloss.Interface.Pure.Game   
+import Tarefa1_2019li1g126
+import Tarefa2_2019li1g126
+--import Tarefa4_2019li1g126
+
+
+corBoost = (makeColorI 51  102 153 100)
+corTerra = (makeColorI 153 102  0  100)    
+corRelva = (makeColorI  0  102  0  100)
+corLama =  (makeColorI 102 51   0  100)
+
+
+drawPeca :: Peca -> Float -> Picture
+drawPeca (Recta piso altura) i          = (translate i 0 (Color (colorir piso) (drawRecta altura))) 
+drawPeca (Rampa piso alturai alturaf) i | alturaf > alturai = (translate i 0 (Color (colorir piso) (drawRampa alturai alturaf)))
+                                        | otherwise         = (translate i 0 (Color (colorir piso) (rampaDescer [(drawRampa alturaf alturai)]))) 
+
+
+colorir :: Piso -> Color
+colorir piso | piso == Terra = corTerra
+             | piso == Relva = corRelva
+             | piso == Lama  = corLama
+             | piso == Boost = corBoost
+
+drawRecta :: Int -> Picture
+drawRecta altura = if (altura > 0) then (translate 0 50 (drawRecta (altura-1))) else reta
+                                     where comprimento = (50*(fromIntegral altura))
+                                           largura     = (50+comprimento)
+                                           reta        = Polygon [(comprimento,comprimento),(largura,comprimento),(largura,largura),(comprimento,largura)]
+
+rampaDescer :: [Picture] -> Picture
+rampaDescer [(Polygon [(a,b),(c,d),(e,f),(g,h)])] = Polygon [(y,d),(x,b),(x,h),(y,f)]
+                                                     where x = 50 + a 
+                                                           y = c - 50
+
+
+drawRampa :: Int -> Int -> Picture 
+drawRampa alturai alturaf = if (alturai > 0) then (translate 0 50 (drawRampa (alturai-1) (alturaf-1))) else rampa
+                                            where comprimentoi = (50*(fromIntegral alturai))
+                                                  comprimentof = (50*(fromIntegral alturaf))
+                                                  largurai     = (50+comprimentoi)
+                                                  larguraf     = (50+comprimentof)
+                                                  rampa        = Polygon [(comprimentoi,comprimentoi),(largurai,comprimentof),(largurai,larguraf),(comprimentoi,largurai)]
+
+-- fazer caso para a rampa a descer --
+
+drawPista :: Pista -> Float -> [Picture]
+drawPista [] _ = [] 
+drawPista (h:t) i = if t/=[] then (drawPeca h i):(drawPista t (i+50)) else [(drawPeca h i)] 
+                                          
+                      
+drawPist :: [Picture] -> Picture
+drawPist (h:t) = Pictures (h:t)
+
+drawMapa :: Mapa -> Float -> [Picture]
+drawMapa []    _ = [] 
+drawMapa [h]   x =  [(Pictures (map (translate 0 (-50*x)) (drawPista h 0)))]
+drawMapa (h:t) x = (translate 0 (-50*x) (Pictures (drawPista h 0))) : (drawMapa t (x+1))
+
+{-
+teste :: Pista -> Picture
+teste pista = (drawPist (drawPista pista 0))
+
+mApa :: Mapa -> Picture
+mApa l = Pictures (map (translate 0 (-50)) (drawMapa l))
+-} 
+
+mapa  = gera 4 9 3
+mapa2 = gera 5 9 5
+mapa3 = gera 9 10 6
+       {--
+        [Pictures
+         [
+          (Color orange (Polygon [(0,0),(50,0),(50,50),(0,50)])), (Color green (Polygon [(50,0),(100,0),(100,50),(50,50)])), (Color corBoost (Polygon [(100,0),(150,0),(150,50),(100,50)]))
+         ]
+        ]
+     --}  
+
+background :: Color
+background = white
+
+window :: Display
+window = InWindow 
+  "Janela de Exemplo" -- título da janela
+  (1000,1000)           -- dimensão da janela
+  (10,10)             -- posição no ecrã
+
+-- | Função principal da Tarefa 5.
+--
+-- __NB:__ Esta Tarefa é completamente livre. Deve utilizar a biblioteca <http://hackage.haskell.org/package/gloss gloss> para animar o jogo, e reutilizar __de forma completa__ as funções das tarefas anteriores.
+main :: IO ()
+main = display FullScreen background (translate (-500) 0 (drawPist (drawMapa mapa2 0)))--}(drawPista (head mapa2) 0)))--ind ) ) )
+                  --where ind = (indice mapa2)

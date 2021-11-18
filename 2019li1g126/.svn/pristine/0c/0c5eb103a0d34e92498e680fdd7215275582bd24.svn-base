@@ -1,0 +1,152 @@
+-- | Este módulo define funções comuns da Tarefa 4 do trabalho prático.
+module Tarefa4_2019li1g126 where
+
+import LI11920
+import Tarefa0_2019li1g126
+import Tarefa1_2019li1g126
+import Tarefa2_2019li1g126
+-- * Testes
+-- | Testes unitários da Tarefa 4.
+--
+-- Cada teste é um par (/tempo/,/'Mapa'/,/'Jogador'/).
+testesT4 :: [(Double,Mapa,Jogador)]
+testesT4 = [(2.5,mapap, [Jogador 0 0 0 0 (Chao True)])]
+    where mapap= gera 1 2 4
+
+-- * Funções principais da Tarefa 4.
+
+-- | Avança o estado de um 'Jogador' um 'passo' em frente, durante um determinado período de tempo.
+--passo :: Double -- ^ O tempo decorrido.
+  --   -> Mapa    -- ^ O mapa utilizado.
+   --  -> Jogador -- ^ O estado anterior do 'Jogador'.
+   --  -> Jogador -- ^ O estado do 'Jogador' após um 'passo'.
+-- passo t m j = move t m (acelera t m j)
+
+-- | Altera a velocidade de um 'Jogador', durante um determinado período de tempo.
+--acelera :: Double -- ^ O tempo decorrido.
+  --   -> Mapa    -- ^ O mapa utilizado.
+    -- -> Jogador -- ^ O estado anterior do 'Jogador'.
+     -- -> Jogador -- ^ O estado do 'Jogador' após acelerar.
+acelera::Double->Mapa->Jogador->Jogador
+acelera t mapa (Jogador p d v c (Chao e))   = velocidadeChao (Jogador p d v c (Chao e)) t mapa 
+acelera t mapa (Jogador p d v c (Ar a i g)) = velocidadeAr (Jogador p d v c (Ar a i g)) t
+-- | Altera a posição de 'Jogador', durante um determinado período de tempo.
+--move :: Double -- ^ O tempo decorrido.
+  --   -> Mapa    -- ^ O mapa utilizado.
+    -- -> Jogador -- ^ O estado anterior do 'Jogador'.
+     -- -> Jogador -- ^ O estado do 'Jogador' após se movimentar.
+--move:: Double->Mapa->Jogador->Jogador     
+--move t mapa (Jogador p d v c (Morto x)) |(x-t)>0   = (Jogador p d v c (Morto (x-t)))
+ --                                       |otherwise = (Jogador p d 0 c (Chao False))
+--
+--move t mapa a@(Jogador p d v c (Chao e))  |((inclinacaoPeca proximapeca >= inclinacaoPeca peca) && ((limitepeca a)== True)) = (Jogador p d v c (Chao e))
+-- |otherwise = (Jogador p d v c (Ar a i 0))
+--
+
+                 --                   where peca = identifica (Jogador p d v c (Chao e)) mapa
+                 --                         proximapeca = identificaproxima (Jogador p d v c (Chao e)) mapa
+                   --                       a = alturaPeca peca (Jogador x y z t (Chao v))
+                     --                     i = inclinacaoPeca pecaatual
+
+--move t mapa b@(Jogador p d v c (Ar a i g)) | ((limitepeca b)==True) = b
+  --                                         | 
+
+
+
+--------------------------------------
+--quando a mota sai da rampa , tem velocidadeJogador , velocidade que continua a ter no ar mas que é diminuida pelo atrito
+--quando rodam a mota, se apontar para o chao mantem na mesma a velocidade e o atrito
+--temos que ir ao angulo, a inclinacao, velocidade
+--como a gravidade puxa pra baixo, a gravidade , conforme o temppo vai passando, a gravidade aumenta
+--pegar no vetor velocidade e soma lo ao vetor gravidade
+--multiplicar pelo tempo que passou e calculas a posicao onde ele vai cair 
+------------------------------------------
+
+
+
+
+limitepeca::Jogador -> Bool
+limitepeca (Jogador p u v c (Ar a i g)) = if (u<(u+1)) then True else False
+limitepeca (Jogador p u v c (Chao e)) = if (u<(u+1)) then True else False
+
+
+
+
+
+--Chao: movimenta-se com velocidade constante na superfície da peça pelo período de tempo t em questão ou até chegar ao limite desta.
+-- Se atingir o limite da peça, o jogador passa para a próxima peça e fica no Chao
+-- com o mesmo estado de aceleraJogador (se a inclinação da próxima peça for maior ou igual que a inclinação da peça atual) 
+-- ou no Ar com inclinacaoJogador igual à direção da peça atual e velocidade gravidadeJogador a zero 
+--(se a inclinação da próxima peça for menor que a inclinação da peça atual).
+ --Em qualquer dos casos, velocidadeJogador é preservada
+
+
+
+
+
+
+
+
+
+
+-- | A atualização da velocidade do jogador está dividida em dois casos: 1) quando o jogador está no chão e 2) quando o jogador está no ar.
+-- | No primeiro caso, a nova velocidade (v') do jogador é calculada através da seguinte fórmula:
+
+{-
+data Jogador--   p                     d                         v                               c               e
+    = Jogador { pistaJogador :: Int, distanciaJogador :: Double, velocidadeJogador :: Double, colaJogador :: Int, estadoJogador :: EstadoJogador }
+  deriving (Read,Show,Eq) -}
+-- t é o instante de tempo em questao
+velocidadeChao::Jogador -> Double ->Mapa -> Jogador
+velocidadeChao (Jogador p d v c (Chao e)) t mapa  | a>=0 = Jogador p d a c (Chao e) 
+                                                  | otherwise= Jogador p d 0 c (Chao e)
+
+         where accelMota = if (v<2 && e==True) then 1 else 0
+               peca = identifica (Jogador p d v c (Chao e)) mapa
+               a= (v  + ((accelMota-((atrito peca)*v))*t))
+
+
+
+-- | No segundo caso (i.e., quando o jogador está no ar) além da nova velocidade,
+-- | é preciso atualizar a velocidade causada pela gravidade.
+
+-- | A nova velocidade do jogador (v') é calculada da seguinte maneira:
+velocidadeAr:: Jogador -> Double-> Jogador
+velocidadeAr  (Jogador p d v c (Ar a i g)) t  | a>=0 = Jogador p d a c (Ar a i b)
+                                              | a<0 =  Jogador p d 0 c (Ar a i b)
+
+                               where a=v - (resistenciaAr * v * t)
+                                     resistenciaAr = 0.125
+                                     accelGravidade = 1
+                                     b = g + (accelGravidade * t)
+
+
+identificaproxima::Jogador->Mapa->Peca
+identificaproxima (Jogador 0 0 z t m) mapa  = (encontraPosicaoMatriz (1,2) mapa)
+identificaproxima (Jogador 0 y z t m) mapa  = (encontraPosicaoMatriz (1,(floor y)+1) mapa)
+identificaproxima (Jogador x y z t m) mapa  = (encontraPosicaoMatriz (x,(floor y)+1) mapa) 
+
+identifica::Jogador->Mapa->Peca
+identifica (Jogador 0 0 z t m) mapa  = (encontraPosicaoMatriz (1,1) mapa)
+identifica (Jogador 0 y z t m) mapa  = (encontraPosicaoMatriz (1,(floor y)) mapa)
+identifica (Jogador x y z t m) mapa  = (encontraPosicaoMatriz (x,(floor y)) mapa) 
+
+atrito::Peca->Double
+atrito (Rampa x a1 a2) | (x== Lama )  = 1.50
+                       | (x== Relva)  = 0.75
+                       | (x== Terra)  = 0.25
+                       | (x== Boost)  = (-0.50)
+                       | (x== Cola )  = 3.00
+
+atrito (Recta x a)     | (x== Lama )  = 1.50
+                       | (x== Relva)  = 0.75
+                       | (x== Terra)  = 0.25
+                       | (x== Boost)  = (-0.50)
+                       | (x== Cola )  = 3.00
+
+--Morto: se a diferencia do timeoutJogador menos o tempo t for maior que 0, apenas o devemos decrementar pelo tempo t em questão. 
+--Caso contrario, o estado do jogador é alterado para Chao False mantendo a velocidade a zero.
+
+
+
+

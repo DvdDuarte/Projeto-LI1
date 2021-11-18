@@ -1,0 +1,114 @@
+-- | Este módulo define funções comuns da Tarefa 2 do trabalho prático.
+module Tarefa1_2019li1g126 where
+
+import LI11920
+import System.Random
+
+-- * Testes
+
+-- | Testes unitários da Tarefa 1.
+--
+-- Cada teste é um tuplo (/número de 'Pista's/,/comprimento de cada 'Pista' do 'Mapa'/,/semente de aleatoriedades/).
+testesT1 :: [(Int,Int,Int)]
+testesT1 = [(4,6,1),(1,2,3),(5,6,7),(4,9,3)]
+
+-- * Funções pré-definidas da Tarefa 1.
+
+geraAleatorios :: Int -> Int -> [Int]
+geraAleatorios n seed = take n (randomRs (0,9) (mkStdGen seed))
+
+-- * Funções principais da Tarefa 1.
+-- gera npistas comprimento semente 
+-- n do geraALeatorios == 2*npistas*comprimentoPistas-2*npistas --
+gera :: Int -> Int -> Int -> Mapa
+gera numeropistas comprimentopistas seed = retaTerra (geraListaPistas (comprimentopistas-1) (geraListaPecas 0 (agrupaPares (geraAleatorios n seed)) Terra))  
+                            where n = 2*numeropistas*(comprimentopistas-1)
+
+{--
+-- calcula o comprimento das pistas --
+comprimentoPistas :: [[(Int,Int)]] -> Int
+comprimentoPistas (h:t) = length h + 1 --(Recta terra 0)-- --
+
+-- calcula o numero de pistas --
+npistas :: [[(Int,Int)]] -> Int
+npistas (h:t) =  length (h:t) 
+--}
+
+retaTerra :: [Pista] -> [Pista]
+retaTerra [] = []
+retaTerra (h:t) = (Recta Terra 0:h) : retaTerra t
+
+geraListaPistas :: Int -> [Peca] -> [Pista]
+geraListaPistas cPistas [] = []
+geraListaPistas cpistas (h:t) = (take cpistas (h:t)): (geraListaPistas cpistas (drop cpistas (h:t)))
+
+-- recebe npistas o comprimento e a seed -> um mapa -> [PISTAS] -> [PECAS] --
+agrupaPares::[Int]->[(Int,Int)]
+agrupaPares [] = []
+agrupaPares [x] = []
+agrupaPares (h:t) = (h,a) : agrupaPares(drop 1 t) 
+ where     a = head t
+
+ 
+ 
+
+{--
+--serve para agrupar a lista dos pisos com a lista das pecas --
+agrupaListasEmPares::[Piso]->[Peca]->[(Piso,Peca)]
+agrupaListasEmPares [] [] =[]
+agrupaListasEmPares (x:xs) (y:ys) = (x,y):agrupaListasEmPares xs ys
+--}
+
+
+
+
+-- o primeiro numero do par e o tipo de piso, o segundo numero do par e o tipo da peca --
+
+escolhePiso :: Int -> Piso -> Piso
+escolhePiso piso  pisoanterior    | (piso>=0) && (piso<=1) = Terra 
+                                  | (piso>=2) && (piso<=3) = Relva 
+                                  | (piso==4)              = Lama 
+                                  | (piso==5)              = Boost         
+                                  | (piso>=6) && (piso<=9) = pisoanterior 
+
+                     
+geraListaPisos :: [(Int,Int)] -> Piso -> [Piso]
+geraListaPisos ((piso,peca):t) pisoanterior = pisob: geraListaPisos t pisob
+             where pisob = escolhePiso piso pisoanterior 
+geraListaPisos [] pisoanterior = []
+ 
+
+--esta funcao recebe h que é a altura da pista neste momento e n que é a gama que determina o tipo de peca
+--como  as rampas podem descer e/ou subir e como hmin=0 entao pus de parte estes casos
+
+alturaFinal :: Peca -> Int
+alturaFinal (Recta piso altura) = altura
+alturaFinal (Rampa piso alturainicial alturaf) | (alturainicial >= 0) && (alturainicial < alturaf) = alturaf--(alturainicial+(peca+1))
+                                               | (alturainicial >= 0) && (alturainicial > alturaf) = alturaf--(alturainicial-(peca-1))
+                                               | otherwise = 0
+
+
+escolhePeca:: Int -> (Int,Int) -> Piso -> Peca 
+escolhePeca alturainicial (piso,peca) pisoanterior  | alturainicial>=0 && ((peca>=0) && (peca<=1)) = Rampa  pisof alturainicial (alturainicial+(peca+1))
+                                                    | alturainicial>=1 && ((peca>=2) && (peca<=5)) = Rampa  pisof alturainicial (alturainicial-(peca-1))                    
+                                                    | alturainicial>=0 && ((peca>=6) && (peca<=9)) = Recta  pisof alturainicial 
+                                                    | otherwise = Recta pisof 0
+                                          where pisof = (escolhePiso piso pisoanterior)
+                                                
+
+geraListaPecas :: Int -> [(Int,Int)] -> Piso-> [Peca] 
+geraListaPecas alturainicial ((piso,peca):t) pisoanterior = pecab : (geraListaPecas alturaf t novopiso) 
+     where novopiso = escolhePiso piso pisoanterior
+           pecab = escolhePeca alturainicial (piso,peca) pisoanterior  
+           alturaf = alturaFinal pecab
+geraListaPecas alturainicial [] pisoanterior = [] 
+
+
+
+{--
+| alturainicial>=0 && ((peca>=0) && (peca<=1)) = (alturainicial+(peca+1))
+                            | alturainicial>=0 && ((peca>=2) && (peca<=5)) = (alturainicial-(peca-1))                     
+                            | alturainicial>=0 && ((peca>=6) && (peca<=9)) = alturainicial 
+                            | otherwise = 0 
+                            where x =
+--}

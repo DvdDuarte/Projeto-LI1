@@ -1,0 +1,130 @@
+-- | Este módulo define funções comuns da Tarefa 2 do trabalho prático.
+module Tarefa2_2019li1g126 where
+
+import LI11920
+import Control.Concurrent
+import Tarefa0_2019li1g126
+-- * Testes
+
+-- | Testes unitários da Tarefa 2.
+--
+-- Cada teste é um triplo (/identificador do 'Jogador'/,/'Jogada' a efetuar/,/'Estado' anterior/).
+--testesT2 :: [(Int,Jogada,Estado)]
+--testesT2 = [,,]
+
+-- * Funções principais da Tarefa 2.
+
+-- | Efetua uma jogada. 
+--
+  --   jogada :: Int -- ^ O identificador do 'Jogador' que efetua a jogada.
+    --   -> Jogada -- ^ A 'Jogada' a efetuar.
+      -- -> Estado -- ^ O 'Estado' anterior.
+       -- -> Estado -- ^ O 'Estado' resultante após o jogador efetuar a jogada.
+       
+--duvidas!!!!!: - tenho que receber a informacao do jogador para as minhas funcoes funcionarem
+--como fazer comparacoes para o teleporta, tarefa3, e o contador , tbm da tarefa 3
+
+
+--jogada :: Int -> Jogada -> Estado -> Estado -- ^ O 'Estado' resultante após o jogador efetuar a jogada.
+--jogada njogador x (Estado mapa jogs) |x == Dispara           = jogadaDispara    njogador (Jogador x y z t m) (Estado mapa jogs)
+--                                     |x == Acelera           = jogadaAcelera    njogador (Jogador x y z t m) (Estado mapa jogs)
+  --                                   |x == Desacelera        = jogadaDesacelera njogador (Jogador x y z t m) (Estado mapa jogs)
+    --                                 |x == Movimenta Direcao = jogadaMovimenta  njogador (Jogador x y z t m) (Estado mapa jogs) 
+   -- where njogador = encontraIndiceLista (Jogador)
+
+
+
+--jogador1 = Jogador 0 2.3 0 5 (Chao True)
+--jogador2 = Jogador 1 0   0 5 (Chao False)
+
+
+--em graus
+inclinacaoPecaAnterior:: Peca -> Float
+inclinacaoPecaAnterior (Recta piso altura) = 0
+inclinacaoPecaAnterior (Rampa piso alturainicial alturaf) | (alturaf >= alturainicial) = (((atan(fromIntegral (alturaf)))*180)/pi)
+                                                          | (alturaf <  alturainicial) = (((atan(fromIntegral (alturainicial)))*180)/pi)
+
+
+
+alturaAnterior::Peca->Int
+alturaAnterior (Recta piso altura) = altura
+alturaAnterior (Rampa piso alturai alturaf) = alturai 
+
+{--
+data Jogador--   x                     y                         z                               t               m
+    = Jogador { pistaJogador :: Int, distanciaJogador :: Double, velocidadeJogador :: Double, colaJogador :: Int, estadoJogador :: EstadoJogador }
+  deriving (Read,Show,Eq)--}
+
+--Quando um jogador morre, a mota para instantaneamente e o seu timeout para renascer é inicializado a 1.0. 
+
+
+
+jogadaDispara:: Int -> Jogador->Estado->Estado
+jogadaDispara njogador (Jogador x y z t m) (Estado mapa jogs) | t>0 && ((m==(Chao True))||(m==(Chao False))) = (Estado (atualizaPosicaoMatriz (x,floor(y-1)) peca mapa) (atualizaIndiceLista njogador (Jogador x y z (t-1) m) jogs))
+                                                              | otherwise =(Estado mapa (atualizaIndiceLista njogador (Jogador x y z 0 m) jogs))
+                                  where peca =identificaColaPecaAnterior njogador (Jogador x y z t m) (Estado mapa jogs)
+
+colaPiso::Peca-> Peca
+colaPiso (Recta x y) = (Recta Cola y)
+colaPiso (Rampa x y z) = (Rampa Cola y z)
+
+
+--isto dá me uma peca, por exemplo Reta Terra 0
+identificaColaPecaAnterior:: Int-> Jogador ->Estado-> Peca
+identificaColaPecaAnterior njogador (Jogador x y z t m) (Estado mapa jogs) = colaPiso(encontraPosicaoMatriz (x,floor(y-1)) mapa)                                                          
+
+identificaPecaAnterior::Int->Jogador->Estado ->Peca
+identificaPecaAnterior njogador (Jogador x y z t m) (Estado mapa jogs) = (encontraPosicaoMatriz (x,floor(y-1)) mapa) 
+
+identificaPecaAtual::Int->Jogador->Estado ->Peca
+identificaPecaAtual njogador (Jogador x y z t m) (Estado mapa jogs) = (encontraPosicaoMatriz (x,(floor y)) mapa) 
+
+jogadaAcelera::Int -> Jogador->Estado-> Estado
+jogadaAcelera njogador (Jogador x y z t (Chao False)) (Estado mapa jogs ) = Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Chao True)) jogs)
+jogadaAcelera j e f = f
+
+jogadaDesacelera::Int -> Jogador->Estado->Estado
+jogadaDesacelera njogador (Jogador x y z t (Chao True)) (Estado mapa jogs ) = Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Chao False)) jogs)
+jogadaDesacelera j e f = f
+
+--l altura, m inclinacao e n é gravidade
+-- para a esquerda +15graus
+--para a direita -15graus
+--a inclinacao maxima é 90 e a minima é -90 graus
+
+{--
+data Jogador--   x                     y                         z                               t               m
+    = Jogador { pistaJogador :: Int, distanciaJogador :: Double, velocidadeJogador :: Double, colaJogador :: Int, estadoJogador :: EstadoJogador }
+  deriving (Read,Show,Eq)--}
+
+jogadaMovimenta::Direcao->Int->Jogador->Estado -> Estado
+jogadaMovimenta E njogador (Jogador x y z t (Ar l m n)) (Estado mapa jogs)  |(((difalturas pecaanterior pecaatual) <= 0.2) && ((m>=(-90))&&(m<=85))) =  (Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Ar l (m+15) n)) jogs))
+                                                                            |(((difalturas pecaanterior pecaatual)<= 0.2) && ((m<(-90))&&(m>85)))  =  (Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Ar l 90 n )) jogs))
+                                                                            |otherwise= (Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Morto 1.0)) jogs))
+
+jogadaMovimenta D njogador (Jogador x y z t (Ar l m n)) (Estado mapa jogs)  | (((difalturas pecaanterior pecaatual)<= 0.2) &&((m>=(-85))&&(m<=90))) = (Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Ar l (m-15) n)) jogs))
+                                                                            | (((difalturas pecaanterior pecaatual)<= 0.2) &&((m<(-85))&&(m>90))) =  (Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Ar l (-90) n)) jogs))
+                                                                            | otherwise= (Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Morto 1.0))  jogs))
+
+jogadaMovimenta B njogador (Jogador x y z t (Chao v))   (Estado mapa jogs)  |(difalturas pecaanterior pecaatual) <= 0.2 =  (Estado mapa (atualizaIndiceLista njogador (Jogador (x+1) y z t (Chao v)) jogs))
+                                                                            |(difalturas pecaanterior pecaatual) >  0.2 =(Estado mapa (atualizaIndiceLista njogador (Jogador x y z t (Morto 1.0)) jogs))
+
+jogadaMovimenta C njogador (Jogador x y z t (Chao v))   (Estado mapa jogs)  |(pecaanterior==(difalturas pecaanterior pecaatual) <= 0.2 = (Jogador (x-1) y z t (Chao v))    (Estado mapa jogs)
+                                                                            |(difalturas pecaanterior pecaatual) >  0.2 = (Estado mapa ( atualizaIndiceLista njogador (Jogador x y z t (Morto 1.0)) jogs))                                          
+                                                                        
+                                                                        where pecaanterior= identificaPecaAnterior njogador (Jogador x y z t m) (Estado mapa jogs)
+                                                                              pecaatual= identificaPecaAtual njogador (Jogador x y z t m) (Estado mapa jogs)
+  
+
+difalturas:: Peca->Peca-> Double
+difalturas (Recta piso altura1) (Recta piso2 altura2)= abs(altura1-altura2)
+difalturas (Recta piso altura1) (Rampa piso2 alturai alturaf) = abs (altura1- (alturaRampa (Rampa piso2 alturai alturaf) (Jogador pista x v c e) ))   
+difalturas (Rampa piso2 alturai alturaf) (Recta piso altura1) = abs (altura1- (alturaRampa (Rampa piso2 alturai alturaf) (Jogador pista x v c e) ))
+difalturas b@(Rampa piso2 alturai alturaf) a@(Rampa piso1 alturain alturafi) = abs ((alturaRampa b (Jogador pista x v c e))-(alturaRampa a (Jogador pista x v c e)))
+
+
+alturaRampa::Peca-> Jogador-> Double
+alturaRampa (Rampa piso alturai alturaf) (Jogador pista x v c e) = (m*(floor x))-b
+                                          where m = alturaf-alturai
+                                                b = alturai
+                    

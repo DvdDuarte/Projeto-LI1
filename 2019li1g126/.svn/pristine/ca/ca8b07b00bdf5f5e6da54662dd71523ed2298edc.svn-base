@@ -1,0 +1,88 @@
+-- | Este módulo define funções comuns da Tarefa 2 do trabalho prático.
+module Tarefa1_2019li1g126 where
+
+import LI11920
+import System.Random
+
+-- * Testes
+
+-- | Testes unitários da Tarefa 1.
+--
+-- Cada teste é um tuplo (/número de 'Pista's/,/comprimento de cada 'Pista' do 'Mapa'/,/semente de aleatoriedades/).
+testesT1 :: [(Int,Int,Int)]
+testesT1 = [(4,100,1)]
+
+-- * Funções pré-definidas da Tarefa 1.
+
+geraAleatorios :: Int -> Int -> [Int]
+geraAleatorios n seed = take n (randomRs (0,9) (mkStdGen seed))
+
+-- * Funções principais da Tarefa 1.
+-- gera npistas comprimento semente 
+gera :: Int -> Int -> Int -> Mapa
+gera numeroPistas comprimentoPistas seed = undefined --agrupaPares (geraAleatorios n 1) 
+{--
+    where      
+        nPistas = numeroPistas
+        cPistas = comprimentoPistas 
+              n = 2*nPistas*cPistas-2*nPistas 
+          (h:t) = geraAleatorios n 1 
+
+--}
+
+
+{--
+-- calcula o comprimento das pistas --
+comprimentoPistas :: [[(Int,Int)]] -> Int
+comprimentoPistas (h:t) = length h + 1 --(Recta terra 0)-- --
+
+-- calcula o numero de pistas --
+npistas :: [[(Int,Int)]] -> Int
+npistas (h:t) =  length (h:t) 
+--}
+
+-- recebe npistas o comprimento e a seed -> um mapa -> [PISTAS] -> [PECAS] --
+agrupaPares::[Int]->[(Int,Int)]
+agrupaPares [] = []
+agrupaPares (h:t) = (h,a) : agrupaPares(drop 1 t) 
+ where     a = head t
+  -- a seed do geraAleatorios no gera e' predefenida??--
+ -- n do geraALeatorios == 2*npistas*comprimentoPistas-2*npistas) --
+
+
+-- o primeiro numero do par e o tipo de piso, o segundo numero do par e o tipo da peca --
+
+escolhePiso :: (Int,Int) -> Piso
+escolhePiso (piso,peca)      | (piso>=0) || (piso<=1) = Terra 
+                             | (piso>=2) || (piso<=3) = Relva 
+                             | (piso==4)              = Lama 
+                             | (piso==5)              = Boost         
+                             | (piso>=6) || (piso<=9) = Cola
+
+                     
+
+
+
+--escolhePiso :: Int -> Piso
+--escolhePiso n | (piso>=0) || (piso<=1) = Terra 
+--              | (piso>=2) || (piso<=3) = Relva 
+--              | (piso==4)                = Lama 
+--              | (piso==5)                = Boost         
+--              | (piso>=6) || (piso<=9) = Cola
+
+
+--esta funcao recebe h que é a altura da pista neste momento e n que é a gama que determina o tipo de peca
+--como  as rampas podem descer e/ou subir e como hmin=0 entao pus de parte estes casos
+
+--escolhePeca::Int -> Int -> [(Int,Int)] -> Int -> Peca 
+--escolhePeca hi (h:t) hf | hi>=0 && ((n>=0) || (n<=1)) = Rampa &&  hf == hi+1
+--                    | hi>=1 && ((n>=2) || (n<=5)) = Rampa &&  hf == hi-1                      
+--                    | hi>=0 && ((n>=6) || (n<=9)) = Recta &&  hf == hi
+
+
+
+
+
+
+
+

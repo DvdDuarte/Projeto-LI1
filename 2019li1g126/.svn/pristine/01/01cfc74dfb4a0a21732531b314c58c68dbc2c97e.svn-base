@@ -1,0 +1,72 @@
+-- | Este módulo define funções comuns da Tarefa 3 do trabalho prático.
+module Tarefa3_2019li1g126 where
+
+import LI11920
+import Tarefa0_2019li1g126
+import Tarefa1_2019li1g126
+-- * Testes
+
+-- | Testes unitários da Tarefa 3.
+--
+-- Cada teste é um 'Mapa'.
+testesT3 :: [Mapa]
+testesT3 = []
+
+-- * Funções principais da Tarefa 3.
+
+-- | Desconstrói um 'Mapa' numa sequência de 'Instrucoes'.
+--
+-- __NB:__ Uma solução correcta deve retornar uma sequência de 'Instrucoes' tal que, para qualquer mapa válido 'm', executar as instruções '(desconstroi m)' produza o mesmo mapa 'm'.
+--
+-- __NB:__ Uma boa solução deve representar o 'Mapa' dado no mínimo número de 'Instrucoes', de acordo com a função 'tamanhoInstrucoes'.
+desconstroi :: Mapa -> Instrucoes
+desconstroi mapa = undefined
+           --  where mapaSemReTerra0 = map (drop 1) mapa
+           --        numeroPista = (dimensaoMatriz Mapa)
+
+
+indices::[a]->[Int]
+indices [x]= [0]
+indices (h:t)= [0]++[1..b]
+   where b = ((length (h:t))-1)
+
+
+numeroPista :: Mapa -> (Int,Int) -> Int
+numeroPista [] (a,b) = 0
+numeroPista (h:t) (a,b) | b <= d = a
+                        | otherwise = a + 1
+                 
+                 where (c,d) = dimensaoMatriz (h:t)
+
+-- dada uma lista verifica se a cabaeca e igual a um tipo de peca e da a instrucao de acordo com a peca
+gerarInstrucao :: Mapa -> (Int,Int) -> Instrucao 
+gerarInstrucao mapa@(((Recta piso alrutaf):xs):t) (a,b) = Anda [numeroPista mapa (a,b)] piso 
+gerarInstrucao mapa@(((Rampa piso alturai alturaf):xs):t) (a,b) | (alturai<alturaf) = Sobe [numeroPista mapa (a,b)] piso alturaf
+                                                                | (alturai>alturaf) = Desce [numeroPista mapa (a,b)] piso alturai
+
+
+-- mapa = [pista] = [[peca]]
+--gerarinstrucoes e uma funcao que tem que gerar uma [instrucao], ou seja instucoes
+
+gerarInstrucoes :: Mapa -> (Int,Int) -> Instrucoes
+gerarInstrucoes [] _ = []
+gerarInstrucoes mapa@(h:t) (a,b) = (gerarInstrucao mapa (a,(bEs b mapa))) : (gerarInstrucoes listasemprimeirainstrucao (a,b))
+                              where  listasemprimeirainstrucao | head (listaSemPRimeiraInstrucao mapa) == [] = tail (listaSemPRimeiraInstrucao mapa)
+                                                               | otherwise = listaSemPRimeiraInstrucao mapa
+
+
+listaSemPRimeiraInstrucao :: Mapa -> Mapa
+listaSemPRimeiraInstrucao [] = []
+listaSemPRimeiraInstrucao mapa@(h:t) | h == [] = t
+                                     | otherwise = (drop 1 h):t
+
+
+bEs :: Int -> Mapa -> Int
+bEs b mapa | b  <= d -1 = b+1
+           | otherwise = 0  
+             where d = snd (dimensaoMatriz mapa)
+
+
+
+
+

@@ -1,0 +1,37 @@
+-- | Este módulo define funções comuns da Tarefa 2 do trabalho prático.
+module Tarefa1_2019li1g126 where
+
+import LI11920
+import System.Random
+
+-- * Testes
+
+-- | Testes unitários da Tarefa 1.
+--
+-- Cada teste é um triplo (/número de 'Pista's/,/comprimento de cada 'Pista' do 'Mapa'/,/semente de aleatoriedades/).
+testesT1 :: [(Int,Int,Int)]
+testesT1 = [(4,100,1)]
+
+-- * Funções pré-definidas da Tarefa 1.
+
+geraAleatorios :: Int -> Int -> [Int]
+geraAleatorios n seed = take n (randomRs (0,9) (mkStdGen seed))
+
+-- * Funções principais da Tarefa 1.
+-- gera npistas comprimento semente 
+gera :: Int -> Int -> Int -> Mapa
+gera numeroPistas comprimentoPistas seed= undefined 
+
+--recebe npistas o comprimento e a seed -> um mapa -> [PISTAS] -> [PECAS] --
+agrupaPares::[Int]->[(Int,Int)]
+agrupaPares [] = []
+agrupaPares (h:t) = (h,a): agrupaPares(drop 1 t) 
+  where     a = head t
+      nPistas = undefined
+      cPistas = undefined
+        	n = 2*nPistas*cPistas-2*nPistas 
+        (h:t) = geraAleatorios n 1
+
+ -- a seed do geraAleatorios no agrupaPares e' predefenida??--
+
+ --n do geraALeatorios == 2*npistas*comprimentoPistas-2*npistas)

@@ -1,0 +1,52 @@
+-- | Este módulo define funções comuns da Tarefa 2 do trabalho prático.
+module Tarefa2_2019li1g126 where
+
+import LI11920
+
+-- * Testes
+
+-- | Testes unitários da Tarefa 2.
+--
+-- Cada teste é um triplo (/identificador do 'Jogador'/,/'Jogada' a efetuar/,/'Estado' anterior/).
+testesT2 :: [(Int,Jogada,Estado)]
+testesT2 = [3,B,Chao]
+
+-- * Funções principais da Tarefa 2.
+
+-- | Efetua uma jogada.
+jogada :: Int -- ^ O identificador do 'Jogador' que efetua a jogada.
+       -> Jogada -- ^ A 'Jogada' a efetuar.
+       -> Estado -- ^ O 'Estado' anterior.
+       -> Estado -- ^ O 'Estado' resultante após o jogador efetuar a jogada.
+jogada = jogadaMovimentar
+
+--e= Estado m js
+--jgs = [jogador1, jogador2]
+
+--jogador1 = Jogador 0 2.3 0 5 (Chao True)
+--jogador2 = Jogador 1 0   0 5 (Chao False)
+
+
+jogadaMovimentar::Jogada->EstadoJogador->[(Peca,Int)]-> [(Int,Jogada,Estado)]
+jogadaMovimentar _ _ []= []
+jogadaMovimentar B Chao ((peca,alturaatual): xs) | difpistas <= 0.2 = ((snd(head xs)),B,Chao):(jogadaMovimentar B Chao (snd(head xs)))
+                                         | difpistas > 0.2  = (0,B,Morto):(jogadaMovimentar B Chao [])
+      where difpistas= abs(alturaatual- (snd (head xs)))
+
+--jogadaMovimentar B Ar  ((peca piso alturaatual):xs) | difpistas <= 0.2
+  --                    | difpistas  > 0.2 = Ar alturaAnterior inclinacaoPecaAnterior 0                                     
+    ---  where difpistas= abs(alturaatual-(last(snd xs))
+
+
+--alturaAnterior::Int->Int->
+--alturaAnterior alturainicial alturaatual= if alturaatual=alturainicial then 
+
+
+--inclinacaoPecaAnterior::Peca->Float
+--inclinacaoPecaAnterior pecaanterior= if pecaanterior== Rampa then normalizaangulo(??) else inclinacaoPecaAnterior=0
+
+
+
+--Ja definido?--
+---js::[Pista]->[Jogador]
+---js numdepistas numjogador = if x@(length numdepistas) > 0 then x==numjogador else numjogador==0

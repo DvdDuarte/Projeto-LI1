@@ -1,0 +1,72 @@
+-- | Este módulo define funções comuns da Tarefa 6 do trabalho prático.
+module Tarefa6_2019li1g126 where
+
+import LI11920
+import Tarefa3_2019li1g126
+import Tarefa2_2019li1g126
+import Tarefa0_2019li1g126
+import Tarefa1_2019li1g126
+-- * Funções principais da Tarefa 6.
+
+-- | Define um ro'bot' capaz de jogar autonomamente o jogo.
+--bot :: Int          -- ^ O identificador do 'Jogador' associado ao ro'bot'.
+--    -> Estado       -- ^ O 'Estado' para o qual o ro'bot' deve tomar uma decisão.
+--    -> Maybe Jogada -- ^ Uma possível 'Jogada' a efetuar pelo ro'bot'.
+--bot :: Int-> Estado -> Maybe Jogada
+--bot njogador (Estado mapa jogs) = 
+
+
+
+  --               where (Jogador x y z t m)= encontraIndiceLista njogador jogs
+
+
+
+-- jogo acaba em 40s : ganhando o jogador que percorre maior distancia ou aquele que chegue à meta primeiro
+-- executa jogada a cada 0.2s
+-- jogada processada atraves das funcoes jogada e passo
+-- cada jogador comeca com 4 municoes de cola
+-- existe possibilidade de empates
+
+--se prever que em  0.2s entrará em Lama, compare com a outra pista, se tiver relva mude para essa,se tiver cola nao mude
+--se esta outra pista tiver lama, entao calcular quantas lamas esta tem em comparacao a outra
+--se for menor e nao tiver outra pista que nao tenha menor quantidade de lamas (inclusive nunhma lamas) entao muda-se para essa pista
+
+--se prever que em 0.2s entrará em Relva, compare com a outra pista, se esta tiver lama, permanece na relva, se tiver cola nao mude se tiver relva entao
+--mesmas estrategia que fiz para a Lama, qualqur outro piso entao mude
+
+--se prever que em 0.2s entrará em Colam entao compare ,se a sua volta tiver colas, entao calcule qual a pista que tenha menos destes pisos e mude para essa
+--se tiver uma relva e outra lama, va para a relva
+--se tiver boost ou terra, va para boost
+--se tiver terra ou relva, va para terra
+
+--prioridades
+--BOOST>TERRA>RELVA>LAMA>COLA
+
+-- | Relatório (da Tarefa 6)
+-- | Objetivo : Fazer um bot que seja o mais rápido e eficiente possível. Este avaliará o estado do mapa, fazendo decisões inteligentes (avaliando o atrito oferecido pelos pisos) de forma a que encontre o caminho mais rápido até à meta.
+-- | Decisões e Estratégias:
+-- | Tendo em conta que o bot faz uma jogada a cada 0.2s, decidimos que este analisaria a peça em que estaria a circular dali a 0.2s.
+-- | Sabendo da Tarefa 4 que a ordem de pisos com menos a mais atrito é esta : Boost<Terra<Relva<Lama<Cola; concluimos que é do nosso interesse fazer com que o bot circule sempre no piso em que tenha menor atrito.
+
+--jogadorAcelera::Int->Estado->Maybe Jogada
+--jogadorAcelera njogador (Estado mapa jogs) = if 
+
+
+
+
+
+
+
+
+identificaPiso::Jogador->Mapa ->Piso
+identificaPiso (Jogador 0 0 z t m) mapa = segundocomponente (encontraPosicaoMatriz (0,0) mapa)  
+identificaPiso (Jogador x 0 z t m) mapa = segundocomponente (encontraPosicaoMatriz (x,0) mapa)    
+identificaPiso (Jogador 0 y z t m) mapa = segundocomponente (encontraPosicaoMatriz (0,(floor y)) mapa)
+identificaPiso (Jogador x y z t m) mapa = if y<=1 then segundocomponente (encontraPosicaoMatriz (0,0) mapa) 
+                                          else segundocomponente (encontraPosicaoMatriz (0,(floor y)) mapa)                                     
+
+
+segundocomponente::Peca->Piso
+segundocomponente (Rampa i _ _)= i
+segundocomponente (Recta j _)  = j 
+

@@ -1,0 +1,37 @@
+-- | Este módulo define funções comuns da Tarefa 3 do trabalho prático.
+module Tarefa3_2019li1g126 where
+
+import LI11920
+import Tarefa1_2019li1g126
+-- * Testes
+
+-- | Testes unitários da Tarefa 3.
+--
+-- Cada teste é um 'Mapa'.
+testesT3 :: [Mapa]
+testesT3 = []
+
+-- * Funções principais da Tarefa 3.
+
+-- | Desconstrói um 'Mapa' numa sequência de 'Instrucoes'.
+--
+-- __NB:__ Uma solução correcta deve retornar uma sequência de 'Instrucoes' tal que, para qualquer mapa válido 'm', executar as instruções '(desconstroi m)' produza o mesmo mapa 'm'.
+--
+-- __NB:__ Uma boa solução deve representar o 'Mapa' dado no mínimo número de 'Instrucoes', de acordo com a função 'tamanhoInstrucoes'.
+desconstroi :: Mapa -> Instrucoes
+desconstroi = undefined
+
+indices::[a]->[Int]
+indices [x]= [0]
+indices (h:t)= [0]++[1..b]
+   where b = ((length (h:t))-1)
+
+-- mapa = [[pista]] = [[[peca]]]
+--gerarinstrucoes e uma funcao que tem que gerar uma [instrucao], ou seja instucoes
+gerarInstrucoes :: Mapa -> Instrucoes
+gerarInstrucoes [] = []
+gerarInstrucoes (h:t) = (gerarInstrucao h) : (gerarInstrucoes listaSemPrimeiraInstrucao)
+	  where listaSemPrimeiraInstrucao = (drop 1 h) : t
+             
+
+

@@ -1,0 +1,75 @@
+-- | Este módulo define funções comuns da Tarefa 3 do trabalho prático.
+module Tarefa3_2019li1g126 where
+
+import LI11920
+import Tarefa0_2019li1g126
+import Tarefa1_2019li1g126
+-- * Testes
+
+-- | Testes unitários da Tarefa 3.
+--
+-- Cada teste é um 'Mapa'.
+testesT3 :: [Mapa]
+testesT3 = []
+
+-- * Funções principais da Tarefa 3.
+
+-- | Desconstrói um 'Mapa' numa sequência de 'Instrucoes'.
+--
+-- __NB:__ Uma solução correcta deve retornar uma sequência de 'Instrucoes' tal que, para qualquer mapa válido 'm', executar as instruções '(desconstroi m)' produza o mesmo mapa 'm'.
+--
+-- __NB:__ Uma boa solução deve representar o 'Mapa' dado no mínimo número de 'Instrucoes', de acordo com a função 'tamanhoInstrucoes'.
+desconstroi :: Mapa -> Instrucoes
+desconstroi mapa = undefined
+           --  where mapaSemReTerra0 = map (drop 1) mapa
+           --        numeroPista = (dimensaoMatriz Mapa)
+
+
+indices::[a]->[Int]
+indices [x]= [0]
+indices (h:t)= [0]++[1..b]
+   where b = ((length (h:t))-1)
+
+-- dada uma lista verifica se a cabaeca e igual a um tipo de peca e da a instrucao de acordo com a peca
+gerarInstrucao :: Mapa -> (Int,Int) -> Instrucao 
+gerarInstrucao [] _ = []
+gerarInstrucao (h:t) (a,b) | (head (head (h)) == Recta piso altura) = Anda [numeroPista (h:t) (a,b)] piso
+                           | (((head (head (h))) == Rampa piso x y) && (x<y)) = Sobe [numeroPista (h:t) (a,b)] piso
+                           | (((head (head (h))) == Rampa piso x y) && (x>y)) = Desce [numeroPista (h:t) (a,b)] piso
+                                     where piso = pIso (h:t)
+
+pIso :: Mapa -> Piso
+pIso mapa@(h:t) = case (head(head h)) of
+	              Recta Terra x -> Terra 
+                  Recta Relva x -> Relva
+                  Recta Lama x -> Lama
+                  Recta Boost x -> Boost
+                  Rampa Terra x y -> Terra 
+                  Rampa Relva x y -> Relva
+                  Rampa Lama x y -> Lama
+                  Rampa Boost x y -> Boost
+                     
+
+
+-- mapa = [[pista]] = [[[peca]]]
+--gerarinstrucoes e uma funcao que tem que gerar uma [instrucao], ou seja instucoes
+
+gerarInstrucoes :: Mapa -> Instrucoes
+gerarInstrucoes [] = []
+gerarInstrucoes mapa@(h:t) = (gerarInstrucao mapa (a,bEs)) : (gerarInstrucoes listaSemPrimeiraInstrucao)
+	  where 
+	  	   listaSemPrimeiraInstrucao = (drop 1 h) : t
+           bEs | b + 1 <= d = b+1
+               | otherwise = b
+                where d = snd (dimensaoMatriz mapa)
+
+
+numeroPista :: Mapa -> (Int,Int) -> Int
+numeroPista [] (a,b) = 0
+numeroPista (h:t) (a,b) | b <= d = a
+                        | otherwise = a + 1
+                 
+                 where (c,d) = dimensaoMatriz (h:t)
+
+
+

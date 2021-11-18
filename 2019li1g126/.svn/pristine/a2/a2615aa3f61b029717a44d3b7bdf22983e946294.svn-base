@@ -1,0 +1,60 @@
+-- | Este módulo define funções comuns da Tarefa 2 do trabalho prático.
+module Tarefa2_2019li1g126 where
+
+import LI11920
+
+-- * Testes
+
+-- | Testes unitários da Tarefa 2.
+--
+-- Cada teste é um triplo (/identificador do 'Jogador'/,/'Jogada' a efetuar/,/'Estado' anterior/).
+--testesT2 :: [(Int,Jogada,Estado)]
+--testesT2 = [,,]
+
+-- * Funções principais da Tarefa 2.
+
+-- | Efetua uma jogada.
+jogada :: Int -- ^ O identificador do 'Jogador' que efetua a jogada.
+       -> Jogada -- ^ A 'Jogada' a efetuar.
+       -> Estado -- ^ O 'Estado' anterior.
+       -> Estado -- ^ O 'Estado' resultante após o jogador efetuar a jogada.
+jogada = undefined
+--e= Estado m js
+--jgs = [jogador1, jogador2]
+
+--jogador1 = Jogador 0 2.3 0 5 (Chao True)
+--jogador2 = Jogador 1 0   0 5 (Chao False)
+
+{-- esta funcao é definidad de forma a que receba um tipo de jogada(p/movimentar, ainda nao percebo bem os tipos, ig)
+preciso de saber se o jogador esta no chao ou nao pois tal variara o efeito da funcao neste, e recebo uma lista com alturas 
+precuso destas pra descobrir a dif de pistas  --}
+
+--jogadaMovimentar::Jogada->EstadoJogador->[(Peca,Int)]-> [(Int,Jogada,Estado)]
+--- jogadaMovimentar _ _ []= []
+---jogadaMovimentar B Chao ((peca,alturaatual): xs) | difpistas <= 0.2 = ((snd(head xs)),B,Chao):(jogadaMovimentar B Chao (snd(head xs)))
+  --                                       | difpistas > 0.2  = (0,B,Morto):(jogadaMovimentar B Chao [])
+--      where difpistas= abs(alturaatual- (snd (head xs)))
+
+
+--comentei a parte da funcao em que temos o caso do jogador estar no ar pq para tal precisamos de definir duas funcoes primeiro
+-- a alturaAnterior e a inclinacaoPecaAnterior
+
+
+--jogadaMovimentar B Ar  ((peca piso alturaatual):xs) | difpistas <= 0.2
+  --                    | difpistas  > 0.2 = Ar alturaAnterior inclinacaoPecaAnterior 0                                     
+    ---  where difpistas= abs(alturaatual-(last(snd xs))
+
+
+
+
+
+inclinacaoPecaAnterior:: Peca -> Float
+inclinacaoPecaAnterior (Recta piso altura) = (pi/2)
+inclinacaoPecaAnterior (Rampa piso alturainicial alturaf) | (alturaf >= alturainicial) = (atan(fromIntegral (alturaf)))
+                                                          | (alturaf <  alturainicial) = (atan(fromIntegral (alturainicial)))
+
+
+--nao tenho a certeza se é a isto ao que queríamos chegar
+alturaAnterior::Peca->Int
+alturaAnterior (Recta piso altura) = altura
+alturaAnterior (Rampa piso alturai alturaf) = alturai 

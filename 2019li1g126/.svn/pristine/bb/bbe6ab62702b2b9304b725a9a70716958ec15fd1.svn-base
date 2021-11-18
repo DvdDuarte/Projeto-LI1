@@ -1,0 +1,159 @@
+-- | Este módulo define funções comuns da Tarefa 5 do trabalho prático.
+module Main where
+
+import LI11920
+import Graphics.Gloss
+import Graphics.Gloss.Data.Color
+--import Graphics.Gloss.Juicy 
+import Graphics.Gloss.Interface.Pure.Game   
+import Tarefa1_2019li1g126
+import Tarefa2_2019li1g126
+--import Tarefa4_2019li1g126
+
+-- * Faz as cores das Pecas
+corBoost  = (makeColorI 153 153 102 255)--(makeColorI 51  102 153 255)
+corTerra  = (makeColorI 151 101 51  255)    
+corRelva  = (makeColorI  0  102  0  255)
+corLama   = (makeColorI 102 51   0  255)
+corPBoost = (makeColorI 51  51  51  180)
+corPTerra = (makeColorI 133 68  34  180)
+corPRelva = (makeColorI  0  81   0  180)
+corPLama  = (makeColorI 84  26   0  180)
+
+-- * Serve para dar a cor a's Pecas
+colorir :: Piso -> Color
+colorir piso | piso == Terra = corTerra
+             | piso == Relva = corRelva
+             | piso == Lama  = corLama
+             | piso == Boost = corBoost
+
+-- * Serve para dar a cor a's Paredes quando a altura da peca e' superior a 1
+colorirParede :: Piso -> Color
+colorirParede piso | piso == Terra = corPTerra
+                   | piso == Relva = corPRelva
+                   | piso == Lama  = corPLama
+                   | piso == Boost = corPBoost
+
+-- | Serve Para desenhar uma Peca 
+drawPeca :: Peca -> Float -> Picture
+drawPeca (Recta piso altura) i          = (translate i 0 (Pictures ([(drawRecta altura piso)]++(paredeReta altura piso))))
+drawPeca (Rampa piso alturai alturaf) i | alturaf > alturai = if (alturai>0) then (translate (-50) 0 rampa) else rampa 
+                                        | otherwise         = if (alturaf>0) then (translate (-50) 0 rampaD) else rampaD 
+                                            where rampa  = (translate i 0 (Color (colorir piso) (Pictures ([(drawRampa alturai alturaf)]++(paredeRampa alturai alturaf piso)))))
+                                                  rampaD = (translate i 0 (Color (colorir piso) (rampaDescer (head [(drawRampa alturaf alturai)]))))                                               
+
+
+-- * Desenha a peca que tem como construtor Recta
+drawRecta :: Int -> Piso -> Picture
+drawRecta altura piso = if (altura > 0) then (translate 0 50 (drawRecta (altura-1) piso)) else Pictures [reta,frame]
+                                     where comprimento = (50*(fromIntegral altura))
+                                           largura     = (50+comprimento)
+                                           coordenadas = [(comprimento,comprimento),(largura,comprimento),(largura,largura),(comprimento,largura)]
+                                           reta        = Color (colorir piso) (Polygon coordenadas)
+                                        --   parede      = Color (colorirParede piso) (Polygon [(comprimento,comprimento),(largura,comprimento),(largura,largura),(comprimento,largura)])
+                                           frame       = Color black (Line (coordenadas++[(comprimento,comprimento)]))
+-- * Desenha a parede das Rectas
+paredeReta :: Int -> Piso -> [Picture]
+paredeReta altura piso = if altura == 0 then [Blank] else [wall,frame]
+            where comprimento = (50*(fromIntegral altura))
+                  largura     = (50+comprimento)
+                  teste       = fromIntegral (50*altura)
+                  coordenadas = [(comprimento-teste,comprimento-teste),(largura-teste,comprimento-teste),(largura-teste,largura-50),(comprimento-teste,largura-50)]
+                  wall        = Color (colorirParede piso) (Polygon coordenadas)
+                  frame       = Color black (Line coordenadas)
+
+
+{-
+rampaDescer :: Picture -> Picture
+rampaDescer (Pictures ((Polygon [(a,b),(c,d),(e,f),(g,h)]):(Line [(i,j),(k,l),(m,n),(o,p)]):[])) = (Pictures [rampaD,frame])
+                                                                                                    where x           = 50 + a 
+                                                                                                          y           = c - 50
+                                                                                                          coordenadas = [(y,d),(x,b),(x,h),(y,f)]
+                                                                                                          rampaD      = Polygon coordenadas
+                                                                                                          frame        = Color black (Line (coordenadas++[(y,d)]))  
+-}
+
+-- * Troca as coordenadas da Rampa, espelhando assim a Rampa que tinha sido desenhada
+rampaDescer :: Picture -> Picture
+rampaDescer (Polygon [(a,b),(c,d),(e,f),(g,h)]) = rampaD
+                                            where x           = 50 + a 
+                                                  y           = c - 50
+                                                  coordenadas = [(y,d),(x,b),(x,h),(y,f)]
+                                                  rampaD      = Polygon coordenadas
+
+-- * Desenha a peca que tem como construtor Rampa
+drawRampa :: Int -> Int -> Picture 
+drawRampa alturai alturaf = if (alturai > 1) then (translate 0 50 (drawRampa (alturai-1) (alturaf-1))) else (Pictures [rampa,frame])
+                                                where comprimentoi = (50*(fromIntegral alturai))
+                                                      comprimentof = (50*(fromIntegral alturaf))
+                                                      largurai     = (50+comprimentoi)
+                                                      larguraf     = (50+comprimentof)
+                                                      coordenadas  = [(comprimentoi,comprimentoi),(largurai,comprimentof),(largurai,larguraf),(comprimentoi,largurai)]
+                                                      rampa        = Polygon coordenadas
+                                                      frame        = Color black (Line (coordenadas++[(comprimentoi,comprimentoi)]))
+
+-- fazer as contas direito pois quando alturai > 2 esta a andar uma peca para a frente
+-- * Desenha a parede das Rectas
+paredeRampa :: Int -> Int -> Piso -> [Picture]
+paredeRampa alturai alturaf piso = if (alturai < 1) then [wall,frame] else [wallS,frameS]
+            where alturaiF    = fromIntegral alturai
+                  alturafF    = fromIntegral alturaf
+                  comprimentoi = (50*(fromIntegral alturai))
+                  comprimentof = (50*(fromIntegral alturaf))
+                  largurai     = (50+comprimentoi)
+                  larguraf     = (50+comprimentof)
+                  teste       = fromIntegral (50*alturai)
+                  testef     = fromIntegral (50*alturaf)
+                  coordenadas  = [(comprimentoi-teste,comprimentoi-teste),(largurai-teste,comprimentof-testef),(largurai-teste,larguraf-50),(comprimentoi-teste,largurai-50)]
+                  wall        = Color (colorirParede piso) (Polygon coordenadas)
+                  frame       = Color black (Line coordenadas)
+                  testeS       = fromIntegral (50*(alturai-(alturai-1)))
+                  testefS     = fromIntegral (50*(alturaf-(alturaf-1)))
+                  coordenadasS  = [(comprimentoi-testeS,comprimentoi-(alturaiF*testeS)),(largurai-testeS,comprimentof-(alturafF*testefS)),(largurai-testeS,larguraf-testefS),(comprimentoi-testeS,largurai-testefS)]
+                  wallS        = Color (colorirParede piso) (Polygon coordenadasS)
+                  frameS       = Color black (Line coordenadasS)
+
+-- fazer caso para a rampa a descer --
+
+-- * Desenha uma Pista com o auxilio da funcao 'drawPeca'
+drawPista :: Pista -> Float -> [Picture]
+drawPista [] _ = [] 
+drawPista (h:t) i = if t/=[] then (drawPeca h i):(drawPista t (i+50)) else [(drawPeca h i)] 
+                                          
+-- * Transforma uma [Picture] gerada pelo 'drawMapa' no Tipo Picture                      
+transformaPic :: [Picture] -> Picture
+transformaPic (h:t) = Pictures (h:t)
+
+-- Desenha um mapa com a ajuda recursiva da funcao 'drawPeca'
+drawMapa :: Mapa -> Float -> [Picture]
+drawMapa []    _ = [] 
+drawMapa [h]   x =  [(Pictures (map (translate 0 (-50*x)) (drawPista h 0)))]
+drawMapa (h:t) x = (translate 0 (-50*x) (Pictures (drawPista h 0))) : (drawMapa t (x+1))
+
+
+mapa  = gera 4 9 3
+mapa2 = gera 5 3 5
+mapa3 = gera 9 10 6
+       {--
+        [Pictures
+         [
+          (Color orange (Polygon [(0,0),(50,0),(50,50),(0,50)])), (Color green (Polygon [(50,0),(100,0),(100,50),(50,50)])), (Color corBoost (Polygon [(100,0),(150,0),(150,50),(100,50)]))
+         ]
+        ]
+     --}  
+
+background :: Color
+background = white
+
+window :: Display
+window = InWindow 
+  "Janela de Exemplo" -- título da janela
+  (1000,1000)           -- dimensão da janela
+  (10,10)             -- posição no ecrã
+
+-- | Função principal da Tarefa 5.
+--
+-- __NB:__ Esta Tarefa é completamente livre. Deve utilizar a biblioteca <http://hackage.haskell.org/package/gloss gloss> para animar o jogo, e reutilizar __de forma completa__ as funções das tarefas anteriores.
+main :: IO ()
+main = display FullScreen background (translate (-500) 0 {-(drawPeca (Rampa Relva 2 5) 0)) --}(transformaPic (drawMapa mapa2 0)))--}(drawPista (head mapa2) 0)))--ind ) ) )
+                  --where ind = (indice mapa2)

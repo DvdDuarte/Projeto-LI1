@@ -1,0 +1,72 @@
+-- | Este módulo define funções comuns da Tarefa 5 do trabalho prático.
+module Main where
+
+import LI11920
+import Graphics.Gloss
+import Graphics.Gloss.Data.Color
+--import Graphics.Gloss.Juicy 
+import Graphics.Gloss.Interface.Pure.Game   
+import Tarefa1_2019li1g126
+import Tarefa2_2019li1g126
+--import Tarefa4_2019li1g126
+
+
+corBoost = (makeColorI 51 102 153 100)
+corTerra = (makeColorI 153 102 0 100)    
+corRelva = (makeColorI 0 102 0 100)
+corLama = (makeColorI 102 51 0 100)
+
+drawPeca :: Peca -> Picture
+drawPeca (Recta piso altura) | piso == Terra = (Color corTerra (Polygon [(comprimento,comprimento),(largura,comprimento),(largura,largura),(comprimento,largura)]))
+                             | piso == Relva = (Color corRelva (Polygon [(comprimento,comprimento),(largura,comprimento),(largura,largura),(comprimento,largura)]))
+                             | piso == Lama = (Color corLama (Polygon [(comprimento,comprimento),(largura,comprimento),(largura,largura),(comprimento,largura)]))
+                             | piso == Boost = (Color corBoost (Polygon [(comprimento,comprimento),(largura,comprimento),(largura,largura),(comprimento,largura)]))
+                                     where comprimento = (10*(fromIntegral altura))
+                                           largura = (10+comprimento)
+drawPeca (Rampa piso alturai alturaf) | alturaf > alturai = drawRampa (Rampa piso alturai alturaf)
+                                      | otherwise = translate (fromIntegral alturai) (rotate 180 (drawRampa (Rampa piso alturaf alturai))) 
+
+drawRampa :: Peca -> Picture 
+drawRampa (Rampa piso alturai alturaf) | (piso == Terra) = (Color corTerra (Polygon [(comprimentoi,comprimentoi),(largurai,largurai),(largurai,2*larguraf),(comprimentoi,comprimentof)]))
+                                     --  | piso == Relva = (Color corRelva (Polygon [(0,aF),(10,aF),(15,10+aF),(5,10+aF)]))
+                                     --  | piso == Lama = (Color corLama (Polygon [(0,aF),(10,aF),(15,10+aF),(5,10+aF)]))
+                                     --  | piso == Boost = (Color corBoost (Polygon [(0,aF),(10,aF),(15,10+aF),(5,10+aF)]))
+                                            where comprimentoi = (10*(fromIntegral alturai))
+                                                  comprimentof = (10*(fromIntegral alturaf))
+                                                  largurai = (10+comprimentoi)
+                                                  larguraf = (10+comprimentof)
+
+
+-- rever contas dos pontos da rampa a subir--
+-- fazer caso para a rampa a descer --
+
+
+drawPista :: Pista -> Int -> Picture 
+drawPista (h:t) x | t/=[] = Pictures [drawPeca h, translate 10{--(fromIntegral(10*numeroPeca))--} 0 (drawPista t numeroPeca)]
+                 | otherwise = (drawPeca h)
+                   where numeroPeca = (x+1) 
+
+
+
+mapa = gera 4 9 3
+mapa1 = [Pictures
+         [
+          (Color orange (Polygon [(0,0),(50,0),(50,50),(0,50)])), (Color green (Polygon [(50,0),(100,0),(100,50),(50,50)])), (Color corBoost (Polygon [(100,0),(150,0),(150,50),(100,50)]))
+         ]
+        ]
+
+
+background :: Color
+background = white
+
+window :: Display
+window = InWindow 
+  "Janela de Exemplo" -- título da janela
+  (200,200)           -- dimensão da janela
+  (10,10)             -- posição no ecrã
+
+-- | Função principal da Tarefa 5.
+--
+-- __NB:__ Esta Tarefa é completamente livre. Deve utilizar a biblioteca <http://hackage.haskell.org/package/gloss gloss> para animar o jogo, e reutilizar __de forma completa__ as funções das tarefas anteriores.
+main :: IO ()
+main = display FullScreen background (drawPista (head mapa) 0)

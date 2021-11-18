@@ -1,0 +1,90 @@
+-- | Este módulo define funções comuns da Tarefa 2 do trabalho prático.
+module Tarefa2_2019li1g126 where
+
+import LI11920
+import Control.Concurrent
+-- * Testes
+
+-- | Testes unitários da Tarefa 2.
+--
+-- Cada teste é um triplo (/identificador do 'Jogador'/,/'Jogada' a efetuar/,/'Estado' anterior/).
+--testesT2 :: [(Int,Jogada,Estado)]
+--testesT2 = [,,]
+
+-- * Funções principais da Tarefa 2.
+
+-- | Efetua uma jogada.
+jogada :: Int -- ^ O identificador do 'Jogador' que efetua a jogada.
+       -> Jogada -- ^ A 'Jogada' a efetuar.
+       -> Estado -- ^ O 'Estado' anterior.
+       -> Estado -- ^ O 'Estado' resultante após o jogador efetuar a jogada.
+jogada = undefined
+
+
+--jogador1 = Jogador 0 2.3 0 5 (Chao True)
+--jogador2 = Jogador 1 0   0 5 (Chao False)
+
+
+--em graus
+inclinacaoPecaAnterior:: Peca -> Float
+inclinacaoPecaAnterior (Recta piso altura) = (((pi/2)*180)/pi)
+inclinacaoPecaAnterior (Rampa piso alturainicial alturaf) | (alturaf >= alturainicial) = (((atan(fromIntegral (alturaf)))*180)/pi)
+                                                          | (alturaf <  alturainicial) = (((atan(fromIntegral (alturainicial)))*180)/pi)
+
+
+--nao tenho a certeza se é a isto ao que queríamos chegar
+alturaAnterior::Peca->Int
+alturaAnterior (Recta piso altura) = altura
+alturaAnterior (Rampa piso alturai alturaf) = alturai 
+
+
+type DimensaoMatriz = (Int,Int)
+type PosicaoMatriz = (Int,Int)
+type Matriz a = [[a]]
+--Quando um jogador morre, a mota para instantaneamente e o seu timeout para renascer é inicializado a 1.0. 
+--para encontrar a posicao da peca na pista
+encontraPosicaoMatriz :: PosicaoMatriz -> Matriz a -> a
+encontraPosicaoMatriz (a,b) ((h:t):t1) = if ePosicaoMatrizValida (a,b) ((h:t):t1) == True then encontraIndiceLista b (encontraIndiceLista a ((h:t):t1))
+                                         else error "Nao existe esse elemento" 
+
+encontraIndiceLista :: Int -> [a] -> a
+encontraIndiceLista i (h:t) = if (length (h:t)- i)== length (h:t) && i<length (h:t) then h
+                              else encontraIndiceLista (i-1) t
+
+
+dimensaoMatriz :: Matriz a -> DimensaoMatriz
+dimensaoMatriz [] = (0,0)
+dimensaoMatriz (h:t) = if linhas > 0 then (colunas,linhas) else (0,0)
+                where colunas = (length t)+ 1
+                      linhas = length h
+
+
+-- | Verifica se a posição pertence à matriz.
+ePosicaoMatrizValida :: PosicaoMatriz -> Matriz a -> Bool 
+ePosicaoMatrizValida x [] = False
+ePosicaoMatrizValida (x,y) m  = 0<=x &&  x<w && 0<=y && y<z                            
+                    where (w,z) = dimensaoMatriz m 
+
+{--
+jogadaMovimentar:: [Pista]->Direcao -> Estado -> Estado
+jogadaMovimentar (pecaatual:t) B Chao | difpistas <= 0.2 = Chao
+                        | difpistas >  0.2 = Morto timeoutJogador 1.0
+jogadaMovimentar pecaatual B Ar   | difpistas <= 0.2 = Ar alturaanterior inclin 0
+                        | difpistas >  0.2 = Morto timeoutJogador 1.0
+
+                        where difpistas= encontraPosicaoMatriz pecaatual (pecaatual:t) --ainda nao sei bem o que fazer a isto
+                              alturaanterior = alturaAnterior pecaatual
+                              inclin = inclinacaoPecaAnterior pecaatual
+--jogadaMovimentarDireitaEsquerda:: Direcao -> Estado ->
+--jogadaMovimentarDireitaEsquerda D Chao = inclinacaoPecaAnterior+15
+
+--}
+
+
+jogadaAcelerar:: Jogada ->Bool
+jogadaAcelerar Acelera = (aceleraJogador True)
+
+
+
+
+

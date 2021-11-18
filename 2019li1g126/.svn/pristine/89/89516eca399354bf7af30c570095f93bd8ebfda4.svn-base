@@ -1,0 +1,120 @@
+-- | Este módulo define funções comuns da Tarefa 5 do trabalho prático.
+module Main where
+
+import LI11920
+import Graphics.Gloss
+import Graphics.Gloss.Data.Color
+--import Graphics.Gloss.Juicy 
+import Graphics.Gloss.Interface.Pure.Game   
+import Tarefa1_2019li1g126
+import Tarefa2_2019li1g126
+--import Tarefa4_2019li1g126
+
+
+corBoost = (makeColorI 51  102 153 255)
+corTerra = (makeColorI 153 102  0  255)    
+corRelva = (makeColorI  0  102  0  255)
+corLama =  (makeColorI 102 51   0  255)
+
+drawPeca :: Peca -> Float -> Picture
+drawPeca (Recta piso altura) i          = (translate i 0 (Color (colorir piso) (drawRecta altura)))
+drawPeca (Rampa piso alturai alturaf) i | alturaf > alturai = if (alturai>0) then (translate (-50) 0 rampa) else rampa -- : dFR
+                                        | otherwise         = if (alturaf>0) then (translate (-50) 0 rampaD) else rampaD -- : dFRD
+                                            where rampa  = (translate i 0 (Color (colorir piso) (drawRampa alturai alturaf)))
+                                                  rampaD = (translate i 0 (Color (colorir piso) (rampaDescer (head [(drawRampa alturaf alturai)]))))                                               
+ --                                                 dFR    = [(translate (-50) 0 (drawFrames (rampa)))]
+ --                                                 dFRD   = [(translate (-50) 0 (drawFrames (rampaD)))]
+
+{-
+drawFrames :: Picture -> Picture
+drawFrames (Polygon [(a,b),(c,d),(e,f),(g,h)]) = Pictures [Line [(a,b),(c,d),(e,f),(g,h)]]
+-}
+
+colorir :: Piso -> Color
+colorir piso | piso == Terra = corTerra
+             | piso == Relva = corRelva
+             | piso == Lama  = corLama
+             | piso == Boost = corBoost
+
+drawRecta :: Int -> Picture
+drawRecta altura = if (altura > 0) then (translate 0 50 (drawRecta (altura-1))) else (Pictures [reta,frame])
+                                     where comprimento = (50*(fromIntegral altura))
+                                           largura     = (50+comprimento)
+                                           coordenadas = [(comprimento,comprimento),(largura,comprimento),(largura,largura),(comprimento,largura)]
+                                           reta        = Polygon coordenadas
+                                           frame       = Color black (Line (coordenadas++[(comprimento,comprimento)]))
+{-
+rampaDescer :: Picture -> Picture
+rampaDescer (Pictures ((Polygon [(a,b),(c,d),(e,f),(g,h)]):(Line [(i,j),(k,l),(m,n),(o,p)]):[])) = (Pictures [rampaD,frame])
+                                                                                                    where x           = 50 + a 
+                                                                                                          y           = c - 50
+                                                                                                          coordenadas = [(y,d),(x,b),(x,h),(y,f)]
+                                                                                                          rampaD      = Polygon coordenadas
+                                                                                                          frame        = Color black (Line (coordenadas++[(y,d)]))  
+-}
+rampaDescer :: Picture -> Picture
+rampaDescer (Polygon [(a,b),(c,d),(e,f),(g,h)]) = rampaD
+                                            where x           = 50 + a 
+                                                  y           = c - 50
+                                                  coordenadas = [(y,d),(x,b),(x,h),(y,f)]
+                                                  rampaD      = Polygon coordenadas
+
+drawRampa :: Int -> Int -> Picture 
+drawRampa alturai alturaf = if (alturai > 1) then (translate 0 50 (drawRampa (alturai-1) (alturaf-1))) else rampa--(Pictures [rampa,frame])
+                                                where comprimentoi = (50*(fromIntegral alturai))
+                                                      comprimentof = (50*(fromIntegral alturaf))
+                                                      largurai     = (50+comprimentoi)
+                                                      larguraf     = (50+comprimentof)
+                                                      coordenadas  = [(comprimentoi,comprimentoi),(largurai,comprimentof),(largurai,larguraf),(comprimentoi,largurai)]
+                                                      rampa        = Polygon coordenadas
+                                                      frame        = Color black (Line (coordenadas++[(comprimentoi,comprimentoi)]))
+
+-- fazer caso para a rampa a descer --
+
+drawPista :: Pista -> Float -> [Picture]
+drawPista [] _ = [] 
+drawPista (h:t) i = if t/=[] then (drawPeca h i):(drawPista t (i+50)) else [(drawPeca h i)] 
+                                          
+                      
+drawPist :: [Picture] -> Picture
+drawPist (h:t) = Pictures (h:t)
+
+drawMapa :: Mapa -> Float -> [Picture]
+drawMapa []    _ = [] 
+drawMapa [h]   x =  [(Pictures (map (translate 0 (-50*x)) (drawPista h 0)))]
+drawMapa (h:t) x = (translate 0 (-50*x) (Pictures (drawPista h 0))) : (drawMapa t (x+1))
+
+{-
+teste :: Pista -> Picture
+teste pista = (drawPist (drawPista pista 0))
+
+mApa :: Mapa -> Picture
+mApa l = Pictures (map (translate 0 (-50)) (drawMapa l))
+-} 
+
+mapa  = gera 4 9 3
+mapa2 = gera 5 9 5
+mapa3 = gera 9 10 6
+       {--
+        [Pictures
+         [
+          (Color orange (Polygon [(0,0),(50,0),(50,50),(0,50)])), (Color green (Polygon [(50,0),(100,0),(100,50),(50,50)])), (Color corBoost (Polygon [(100,0),(150,0),(150,50),(100,50)]))
+         ]
+        ]
+     --}  
+
+background :: Color
+background = white
+
+window :: Display
+window = InWindow 
+  "Janela de Exemplo" -- título da janela
+  (1000,1000)           -- dimensão da janela
+  (10,10)             -- posição no ecrã
+
+-- | Função principal da Tarefa 5.
+--
+-- __NB:__ Esta Tarefa é completamente livre. Deve utilizar a biblioteca <http://hackage.haskell.org/package/gloss gloss> para animar o jogo, e reutilizar __de forma completa__ as funções das tarefas anteriores.
+main :: IO ()
+main = display FullScreen background (translate (-500) 0 {-(Pictures (drawPeca (Recta Terra 0) 0))) --}(drawPist (drawMapa mapa2 0)))--}(drawPista (head mapa2) 0)))--ind ) ) )
+                  --where ind = (indice mapa2)
